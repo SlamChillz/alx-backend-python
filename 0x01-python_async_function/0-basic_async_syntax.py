@@ -4,10 +4,9 @@ Defines a basic asynchronous routine
 """
 import asyncio
 import random
-from typing import Union
 
 
-async def wait_random(max_delay: int = 10) -> Union[int, float]:
+async def wait_random(max_delay: int = 10) -> float:
     """
     An asynchronous coroutine that waits for a random delay
     between 0 and max_delay (included and float value) seconds
