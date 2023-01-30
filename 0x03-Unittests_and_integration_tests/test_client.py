@@ -38,14 +38,16 @@ class TestGithubOrgClient(unittest.TestCase):
         """
         Test _public_repos_url property
         """
-        config = {'return_value':
-                  {'repos_url': 'https://api.github.com/slam/repos/alx'}}
-
+        config = {
+            'return_value.repos_url': 'https://api.github.com/slam/repos/alx'
+        }
         with patch('client.GithubOrgClient.org',
                    new_callable=PropertyMock, **config) as mockOrg:
             test = GithubOrgClient('alx')
-            self.assertEqual(test._public_repos_url,
-                             mockOrg.return_value['repos_url'])
+            self.assertEqual(
+                test._public_repos_url,
+                mockOrg.return_value['repos_url']
+            )
 
     @parameterized.expand([
         ('nginx-1.0', []),
@@ -54,9 +56,10 @@ class TestGithubOrgClient(unittest.TestCase):
         (None, ['cpp-netlib', 'dagger', 'dot-net']),
     ])
     @patch('client.get_json')
-    def test_public_repos(self, license_key: str,
-                          expected: List[str],
-                          mockGetJson: MagicMock) -> None:
+    def test_public_repos(
+            self, license_key: str,
+            expected: List[str], mockGetJson: MagicMock
+            ) -> None:
         """
         Test public_repos method
         Args:
@@ -65,23 +68,33 @@ class TestGithubOrgClient(unittest.TestCase):
         Returns:
             None
         """
-        config = {'return_value':
-                  [{'name': 'cpp-netlib', 'license': {'key': 'bsl-1.0'}},
-                   {'name': 'dagger', 'license': {'key': 'apache-2.0'}},
-                   {'name': 'dot-net', 'license': {'key': 'bsl-1.0'}}]}
+        config = {
+            'return_value':
+            [
+                {'name': 'cpp-netlib', 'license': {'key': 'bsl-1.0'}},
+                {'name': 'dagger', 'license': {'key': 'apache-2.0'}},
+                {'name': 'dot-net', 'license': {'key': 'bsl-1.0'}}
+            ]
+        }
         mockGetJson.configure_mock(**config)
-        propValue = {'return_value':
-                     {'repos_url': 'https://api.github.com/orgs/google/repos'}}
+        propValue = {
+            'return_value.repos_url':
+            'https://api.github.com/orgs/google/repos'
+        }
         with patch('client.GithubOrgClient._public_repos_url',
                    new_callable=PropertyMock, **propValue) as mockPublicRepo:
             test = GithubOrgClient('google')
-            self.assertListEqual(test.public_repos(license_key), expected)
+            self.assertEqual(test.public_repos(license_key), expected)
             mockPublicRepo.assert_called_once()
         mockGetJson.assert_called_once()
 
     @parameterized.expand([
-        ({"license": {"key": "my_license"}}, "my_license", True),
-        ({"license": {"key": "other_license"}}, "my_license", False),
+        (
+            {"license": {"key": "my_license"}}, "my_license", True
+        ),
+        (
+            {"license": {"key": "other_license"}}, "my_license", False
+        ),
     ])
     def test_has_license(self, license: Dict,
                          key: str, expected: bool) -> None:
@@ -94,13 +107,17 @@ class TestGithubOrgClient(unittest.TestCase):
         Returns:
             bool
         """
-        self.assertEqual(GithubOrgClient.has_license(license, key), expected)
+        self.assertEqual(
+            GithubOrgClient.has_license(license, key), expected
+        )
 
 
-@parameterized_class(('org_payload', 'repos_payload',
-                      'expected_repos', 'apache2_repos'), [
-                       payloads for payloads in TEST_PAYLOAD
-])
+@parameterized_class(
+    (
+       'org_payload', 'repos_payload',
+       'expected_repos', 'apache2_repos'
+    ), [payloads for payloads in TEST_PAYLOAD]
+)
 class TestIntegrationGithubOrgClient(unittest.TestCase):
     """
     Integration test for GithubOrgClient
@@ -121,11 +138,13 @@ class TestIntegrationGithubOrgClient(unittest.TestCase):
                     break
             return MagicMock(**config)
 
-        cls.get_patcher = patch('requests.get',
-                                side_effect=response, autospec=True)
-        cls.org_patcher = patch('client.GithubOrgClient.org',
-                                new_callable=PropertyMock,
-                                **{'return_value': cls.org_payload})
+        cls.get_patcher = patch(
+            'requests.get', side_effect=response, autospec=True
+        )
+        cls.org_patcher = patch(
+            'client.GithubOrgClient.org',
+            new_callable=PropertyMock, **{'return_value': cls.org_payload}
+        )
         cls.get_patcher.start()
         cls.org_patcher.start()
 
@@ -134,16 +153,20 @@ class TestIntegrationGithubOrgClient(unittest.TestCase):
         Tests for `public_repos` method without license
         """
         test = GithubOrgClient('google/repos')
-        self.assertEqual(self.expected_repos,
-                         test.public_repos(license=None))
+        self.assertEqual(
+            self.expected_repos,
+            test.public_repos(license=None)
+        )
 
     def test_public_repos_with_license(self) -> None:
         """
         Tests for `public_repos` method with license
         """
         test = GithubOrgClient('google/repos')
-        self.assertEqual(self.apache2_repos,
-                         test.public_repos(license="apache-2.0"))
+        self.assertEqual(
+            self.apache2_repos,
+            test.public_repos(license="apache-2.0")
+        )
 
     @classmethod
     def tearDownClass(cls) -> None:
