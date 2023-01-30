@@ -119,13 +119,17 @@ class TestIntegrationGithubOrgClient(unittest.TestCase):
                     break
             return MagicMock(**config)
 
-        cls.patcher = patch('requests.get',
-                            side_effect=response, autospec=True)
-        cls.get_patcher = cls.patcher.start()
+        cls.requestPatcher = patch('requests.get',
+                                   side_effect=response, autospec=True)
+        cls.orgPatcher = patch('client.GithubOrgClient.org',
+                               return_value=cls.org_payload)
+        cls.get_patcher = cls.requestPatcher.start()
+        cls.org_patcher = cls.orgPatcher.start()
 
     @classmethod
     def tearDownClass(cls) -> None:
         """
         TearDown class method
         """
-        cls.patcher.stop()
+        cls.requestPatcher.stop()
+        cls.orgPatcher.stop()
