@@ -51,6 +51,7 @@ class TestGithubOrgClient(unittest.TestCase):
         ('nginx-1.0', []),
         ('apache-2.0', ['dagger']),
         ('bsl-1.0', ['cpp-netlib', 'dot-net']),
+        (None, ['cpp-netlib', 'dagger', 'dot-net']),
     ])
     @patch('client.get_json')
     def test_public_repos(self, license_key: str,
