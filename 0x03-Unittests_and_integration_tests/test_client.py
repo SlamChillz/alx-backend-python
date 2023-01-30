@@ -55,7 +55,8 @@ class TestGithubOrgClient(unittest.TestCase):
     ])
     @patch('client.get_json')
     def test_public_repos(self, license_key: str,
-                          expected: List[str], mockGetJson) -> None:
+                          expected: List[str],
+                          mockGetJson: MagicMock) -> None:
         """
         Test public_repos method
         Args:
@@ -76,7 +77,7 @@ class TestGithubOrgClient(unittest.TestCase):
             test = GithubOrgClient('google')
             self.assertListEqual(test.public_repos(license_key), expected)
             mockPublicRepo.assert_called_once()
-            mockGetJson.assert_called_once()
+        mockGetJson.assert_called_once()
 
     @parameterized.expand([
         ({"license": {"key": "my_license"}}, "my_license", True),
