@@ -121,13 +121,13 @@ class TestIntegrationGithubOrgClient(unittest.TestCase):
                     break
             return MagicMock(**config)
 
-        cls.requestPatcher = patch('requests.get',
-                                   side_effect=response, autospec=True)
-        cls.orgPatcher = patch('client.GithubOrgClient.org',
-                               new_callable=PropertyMock,
-                               **{'return_value': cls.org_payload})
-        cls.get_patcher = cls.requestPatcher.start()
-        cls.org_patcher = cls.orgPatcher.start()
+        cls.get_patcher = patch('requests.get',
+                                side_effect=response, autospec=True)
+        cls.org_patcher = patch('client.GithubOrgClient.org',
+                                new_callable=PropertyMock,
+                                **{'return_value': cls.org_payload})
+        cls.get_patcher.start()
+        cls.org_patcher.start()
 
     def test_public_repos(self) -> None:
         """
@@ -150,5 +150,5 @@ class TestIntegrationGithubOrgClient(unittest.TestCase):
         """
         TearDown class method
         """
-        cls.requestPatcher.stop()
-        cls.orgPatcher.stop()
+        cls.get_patcher.stop()
+        cls.org_patcher.stop()
