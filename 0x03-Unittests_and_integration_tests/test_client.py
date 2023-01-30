@@ -78,8 +78,7 @@ class TestGithubOrgClient(unittest.TestCase):
         }
         mockGetJson.configure_mock(**config)
         propValue = {
-            'return_value.repos_url':
-            'https://api.github.com/orgs/google/repos'
+            'return_value': 'https://api.github.com/orgs/google/repos'
         }
         with patch('client.GithubOrgClient._public_repos_url',
                    new_callable=PropertyMock, **propValue) as mockPublicRepo:
@@ -89,12 +88,8 @@ class TestGithubOrgClient(unittest.TestCase):
         mockGetJson.assert_called_once()
 
     @parameterized.expand([
-        (
-            {"license": {"key": "my_license"}}, "my_license", True
-        ),
-        (
-            {"license": {"key": "other_license"}}, "my_license", False
-        ),
+        ({"license": {"key": "my_license"}}, "my_license", True),
+        ({"license": {"key": "other_license"}}, "my_license", False),
     ])
     def test_has_license(self, license: Dict,
                          key: str, expected: bool) -> None:
@@ -114,9 +109,8 @@ class TestGithubOrgClient(unittest.TestCase):
 
 @parameterized_class(
     ('org_payload', 'repos_payload',
-     'expected_repos', 'apache2_repos'), [
-     payloads for payloads in TEST_PAYLOAD
-])
+     'expected_repos', 'apache2_repos'),
+    [payloads for payloads in TEST_PAYLOAD])
 class TestIntegrationGithubOrgClient(unittest.TestCase):
     """
     Integration test for GithubOrgClient
