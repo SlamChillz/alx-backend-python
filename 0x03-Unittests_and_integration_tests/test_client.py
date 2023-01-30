@@ -7,7 +7,7 @@ from unittest.mock import patch
 from unittest.mock import MagicMock
 from unittest.mock import PropertyMock
 from parameterized import parameterized
-from typing import List
+from typing import Dict, List
 
 import client
 from client import GithubOrgClient
@@ -74,3 +74,20 @@ class TestGithubOrgClient(unittest.TestCase):
             self.assertListEqual(test.public_repos(license_key), expected)
             mockPublicRepo.assert_called_once()
             mockGetJson.assert_called_once()
+
+    @parameterized.expand([
+        ({"license": {"key": "my_license"}}, "my_license", True),
+        ({"license": {"key": "other_license"}}, "my_license", False),
+    ])
+    def test_has_license(self, license: Dict,
+                         key: str, expected: bool) -> None:
+        """
+        Test license check method
+        Args:
+            license (Dict): dictionary of license information
+            key (str): license key
+            expected (bool): `True` if key if valid else `False`
+        Returns:
+            bool
+        """
+        self.assertEqual(GithubOrgClient.has_license(license, key), expected)
