@@ -55,6 +55,11 @@ class TestGithubOrgClient(unittest.TestCase):
                           expected: List[str], mockGetJson) -> None:
         """
         Test public_repos method
+        Args:
+            license_key (str): license key to validate
+            expected (List): list of repo names with license_key
+        Returns:
+            None
         """
         config = {'return_value':
                   [{'name': 'cpp-netlib', 'license': {'key': 'bsl-1.0'}},
