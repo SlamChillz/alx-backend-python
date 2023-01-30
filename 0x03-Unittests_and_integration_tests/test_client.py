@@ -128,7 +128,7 @@ class TestIntegrationGithubOrgClient(unittest.TestCase):
         cls.get_patcher = cls.requestPatcher.start()
         cls.org_patcher = cls.orgPatcher.start()
 
-    def test_public_repos(self):
+    def test_public_repos(self) -> None:
         """
         Tests for `public_repos` method without license
         """
@@ -136,7 +136,7 @@ class TestIntegrationGithubOrgClient(unittest.TestCase):
         self.assertEqual(self.expected_repos,
                          test.public_repos(license=None))
 
-    def test_public_repos_with_license(self):
+    def test_public_repos_with_license(self) -> None:
         """
         Tests for `public_repos` method with license
         """
