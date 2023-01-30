@@ -96,7 +96,7 @@ class TestGithubOrgClient(unittest.TestCase):
 
 
 @parameterized_class(('org_payload', 'repos_payload',
-                      'expected_payload', 'apache2_repos'), [
+                      'expected_repos', 'apache2_repos'), [
                        payloads for payloads in TEST_PAYLOAD
 ])
 class TestIntegrationGithubOrgClient(unittest.TestCase):
@@ -122,9 +122,26 @@ class TestIntegrationGithubOrgClient(unittest.TestCase):
         cls.requestPatcher = patch('requests.get',
                                    side_effect=response, autospec=True)
         cls.orgPatcher = patch('client.GithubOrgClient.org',
-                               return_value=cls.org_payload)
+                               new_callable=PropertyMock,
+                               **{'return_value': cls.org_payload})
         cls.get_patcher = cls.requestPatcher.start()
         cls.org_patcher = cls.orgPatcher.start()
+
+    def test_public_repos(self):
+        """
+        Tests for `public_repos` method without license
+        """
+        test = GithubOrgClient('google/repos')
+        self.assertEqual(self.expected_repos,
+                         test.public_repos(license=None))
+
+    def test_public_repos_with_license(self):
+        """
+        Tests for `public_repos` method with license
+        """
+        test = GithubOrgClient('google/repos')
+        self.assertEqual(self.apache2_repos,
+                         test.public_repos(license="apache-2.0"))
 
     @classmethod
     def tearDownClass(cls) -> None:
