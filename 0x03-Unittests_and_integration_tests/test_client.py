@@ -7,6 +7,7 @@ from unittest.mock import patch
 from unittest.mock import MagicMock
 from unittest.mock import PropertyMock
 from parameterized import parameterized
+from typing import List
 
 import client
 from client import GithubOrgClient
@@ -31,7 +32,7 @@ class TestGithubOrgClient(unittest.TestCase):
         self.assertEqual(gitClient.org, getJson.return_value)
         getJson.assert_called_once_with(gitClient.ORG_URL.format(org=org))
 
-    def test_public_repos_url(self):
+    def test_public_repos_url(self) -> None:
         """
         Test _public_repos_url property
         """
@@ -50,7 +51,8 @@ class TestGithubOrgClient(unittest.TestCase):
         ('bsl-1.0', ['cpp-netlib', 'dot-net']),
     ])
     @patch('client.get_json')
-    def test_public_repos(self, license_key, expected, mockGetJson):
+    def test_public_repos(self, license_key: str,
+                          expected: List[str], mockGetJson) -> None:
         """
         Test public_repos method
         """
