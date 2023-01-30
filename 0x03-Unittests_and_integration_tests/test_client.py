@@ -43,3 +43,27 @@ class TestGithubOrgClient(unittest.TestCase):
             test = GithubOrgClient('alx')
             self.assertEqual(test._public_repos_url,
                              mockOrg.return_value['repos_url'])
+
+    @parameterized.expand([
+        ('nginx-1.0', []),
+        ('apache-2.0', ['dagger']),
+        ('bsl-1.0', ['cpp-netlib', 'dot-net']),
+    ])
+    @patch('client.get_json')
+    def test_public_repos(self, license_key, expected, mockGetJson):
+        """
+        Test public_repos method
+        """
+        config = {'return_value':
+                  [{'name': 'cpp-netlib', 'license': {'key': 'bsl-1.0'}},
+                   {'name': 'dagger', 'license': {'key': 'apache-2.0'}},
+                   {'name': 'dot-net', 'license': {'key': 'bsl-1.0'}}]}
+        mockGetJson.configure_mock(**config)
+        propValue = {'return_value':
+                     {'repos_url': 'https://api.github.com/orgs/google/repos'}}
+        with patch('client.GithubOrgClient._public_repos_url',
+                   new_callable=PropertyMock, **propValue) as mockPublicRepo:
+            test = GithubOrgClient('google')
+            self.assertListEqual(test.public_repos(license_key), expected)
+            mockPublicRepo.assert_called_once()
+            mockGetJson.assert_called_once()
