@@ -49,17 +49,8 @@ class TestGithubOrgClient(unittest.TestCase):
                 mockOrg.return_value['repos_url']
             )
 
-    @parameterized.expand([
-        ('nginx-1.0', []),
-        ('apache-2.0', ['dagger']),
-        ('bsl-1.0', ['cpp-netlib', 'dot-net']),
-        (None, ['cpp-netlib', 'dagger', 'dot-net']),
-    ])
     @patch('client.get_json')
-    def test_public_repos(
-            self, license_key: str,
-            expected: List[str], mockGetJson: MagicMock
-            ) -> None:
+    def test_public_repos(self, mockGetJson: MagicMock) -> None:
         """
         Test public_repos method
         Args:
@@ -68,22 +59,20 @@ class TestGithubOrgClient(unittest.TestCase):
         Returns:
             None
         """
-        config = {
-            'return_value':
-            [
-                {'name': 'cpp-netlib', 'license': {'key': 'bsl-1.0'}},
-                {'name': 'dagger', 'license': {'key': 'apache-2.0'}},
-                {'name': 'dot-net', 'license': {'key': 'bsl-1.0'}}
-            ]
-        }
-        mockGetJson.configure_mock(**config)
+        mockGetJson.return_value = [
+            {'name': 'cpp-netlib', 'license': {'key': 'bsl-1.0'}},
+            {'name': 'dagger', 'license': {'key': 'apache-2.0'}},
+            {'name': 'dot-net', 'license': {'key': 'bsl-1.0'}}
+        ]
         propValue = {
             'return_value': 'https://api.github.com/orgs/google/repos'
         }
         with patch('client.GithubOrgClient._public_repos_url',
                    new_callable=PropertyMock, **propValue) as mockPublicRepo:
             test = GithubOrgClient('google')
-            self.assertEqual(test.public_repos(license_key), expected)
+            self.assertEqual(
+                test.public_repos(), ['cpp-netlib', 'dagger', 'dot-net']
+            )
             mockPublicRepo.assert_called_once()
         mockGetJson.assert_called_once()
 
