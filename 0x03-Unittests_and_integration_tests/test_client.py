@@ -2,7 +2,6 @@
 """
 Tests for GithubOrgClient class methods
 """
-import requests
 import unittest
 from unittest.mock import patch
 from unittest.mock import MagicMock
@@ -118,9 +117,7 @@ class TestIntegrationGithubOrgClient(unittest.TestCase):
                     break
             return MagicMock(**config)
 
-        cls.get_patcher = patch(
-            'requests.get', side_effect=response, autospec=True
-        )
+        cls.get_patcher = patch('requests.get', side_effect=response)
         cls.org_patcher = patch(
             'client.GithubOrgClient.org',
             new_callable=PropertyMock, **{'return_value': cls.org_payload}
